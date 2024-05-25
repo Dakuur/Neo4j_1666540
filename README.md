@@ -1,4 +1,4 @@
-# Projecte-Neo4j-Grup13
+# Projecte Neo4j Grup 13
 
 Bases de dades no relacionals. Curs 2023-2024
 
