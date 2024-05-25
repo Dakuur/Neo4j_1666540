@@ -2,7 +2,7 @@
 
 Bases de dades no relacionals. Curs 2023-2024
 
-Professora: Laura Rivera Sanchez
+Professora: Alícia Fornes
 
 Participants i NIUs:
 -  Adrià Muro Gómez (1665191) 
