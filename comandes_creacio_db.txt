@@ -1,7 +1,7 @@
 // Delete all
 
 match (a) -[r] -> () delete a, r;
-match (a) delete a
+match (a) delete a;
 
 
 
