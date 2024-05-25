@@ -1,0 +1,67 @@
+// Delete all
+
+match (a) -[r] -> () delete a, r;
+match (a) delete a
+
+
+
+// Load Houses
+
+LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT0ZhR6BSO_M72JEmxXKs6GLuOwxm_Oy-0UruLJeX8_R04KAcICuvrwn2OENQhtuvddU5RSJSclHRJf/pub?output=csv' AS row
+
+WITH row, row.Municipi + "_" + row.Any_Padro + "_" + row.Id_Llar AS house_id
+MERGE (n:House {id: house_id})
+SET n.any_padro = row.Any_Padro,
+    n.numero = row.Numero,
+    n.municipi = row.Municipi,
+    n.id_llar = row.Id_Llar,
+    n.carrer = row.Carrer;
+
+CREATE INDEX house_id_index IF NOT EXISTS FOR (n:House) ON (n.id);
+
+
+
+// Load Individuals
+
+LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTfU6oJBZhmhzzkV_0-avABPzHTdXy8851ySDbn2gq32WwaNmYxfiBtCGJGOZsMgCWjzlEGX4Zh1wqe/pub?output=csv' AS row
+
+MERGE (n:Individual {id: row.Id})
+SET n.year = row.Year,
+    n.name = row.name,
+    n.surname = row.surname,
+    n.second_surname = row.second_surname;
+
+CREATE INDEX individual_id_index IF NOT EXISTS FOR (n:Individual) ON (n.id);
+
+
+
+// Load Families
+
+LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRVOoMAMoxHiGboTjCIHo2yT30CCWgVHgocGnVJxiCTgyurtmqCfAFahHajobVzwXFLwhqajz1fqA8d/pub?output=csv' AS row
+
+MATCH (n1: Individual {id: row.ID_1}), (n2: Individual {id: row.ID_2})
+CREATE (n1)-[f:IS_FAMILY]->(n2)
+SET f.relacio = row.Relacio,
+    f.relacio_harmonitzada = row.Relacio_Harmonitzada;
+
+
+
+// Load Living
+
+LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRM4DPeqFmv7w6kLH5msNk6_Hdh1wuExRirgysZKO_Q70L21MKBkDISIyjvdm8shVixl5Tcw_5zCfdg/pub?output=csv' AS row
+
+WITH row, row.Location + "_" + row.Year + "_" + row.HOUSE_ID AS house_id
+MATCH (n: Individual {id: row.IND}), (h: House {id: house_id})
+CREATE (n)-[l:LIVES_IN]->(h)
+SET l.viu = row.VIU,
+    l.locations = row.Location,
+    l.year = row.Year;
+
+
+
+// Load Same_as
+
+LOAD CSV WITH HEADERS FROM 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTgC8TBmdXhjUOPKJxyiZSpetPYjaRC34gmxHj6H2AWvXTGbg7MLKVdJnwuh5bIeer7WLUi0OigI6wc/pub?output=csv' AS row
+
+MATCH (n1: Individual {id: row.Id_A}), (n2: Individual {id: row.Id_B})
+CREATE (n1)-[:SAME_AS]->(n2)
