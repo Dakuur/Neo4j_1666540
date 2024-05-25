@@ -2,7 +2,7 @@
 
 Bases de dades no relacionals. Curs 2023-2024
 
-Professora: Alícia Fornes
+Professora: Alicia Fornes Bisquerra
 
 Participants i NIUs:
 -  Adrià Muro Gómez (1665191) 
