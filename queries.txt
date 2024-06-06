@@ -1,0 +1,49 @@
+// A
+
+MATCH (h:House {municipality: 'SFLL'})<-[:LIVES_IN]-(i:Individual)
+WITH h.year_padron as padro, i
+WHERE i.surname IS NOT NULL AND i.surname <> "nan"
+RETURN padro as padro, COUNT(DISTINCT i) AS num_habitants, COLLECT(DISTINCT i.surname) as cognoms
+ORDER BY padro
+
+
+// B
+
+MATCH (i:Individual)-[:SAME_AS]->(in:Individual)
+WHERE (in.name = "miguel" AND in.surname = "estape" AND in.second_surname = "bofill")
+WITH i 
+RETURN i.name as nom, 
+    COLLECT(DISTINCT i.surname) as cognoms,
+    COLLECT(DISTINCT i.second_surname) as segons_cognoms
+ORDER BY nom
+
+
+// C
+
+MATCH(pare:Individual{name: "benito", surname:"julivert"})-[r:IS_FAMILY]->(fill:Individual)
+WHERE r.harmonized_relationship IN ["fill","filla"]
+WITH fill,r 
+
+RETURN fill.name as nom_fill,
+    fill.surname as cognom_fill, 
+    fill.second_surname as segon_cognom_fill, 
+    r.harmonized_relationship as tipus_de_relacio
+
+ORDER BY nom_fill
+
+
+// D
+
+MATCH (h:House{municipality:"CR"})<-[:LIVES_IN]-(p:Individual)
+WITH p, h
+MATCH (p)-[r:IS_FAMILY]->(fill:Individual) 
+WHERE r.harmonized_relationship IN ["fill","filla"] 
+WITH p,COUNT(fill) AS numero_fills
+WHERE numero_fills > 3
+
+RETURN p.name as nom_cap,
+    p.surname as cognom1_cap, 
+    p.second_surname as cognom2_cap,
+    numero_fills as num_fills
+ORDER BY num_fills DESC
+LIMIT 20
