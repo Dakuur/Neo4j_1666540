@@ -52,9 +52,7 @@ LIMIT 20
 
 MATCH (h:House {municipality: 'SFLL'})<-[:LIVES_IN]-(i:Individual)
 WITH h.year_padron AS any, h.street AS carrer, COUNT(i) AS num_habitants
-WITH any, carrer, num_habitants, min(num_habitants) OVER (PARTITION BY any) AS min_habitants
-WHERE num_habitants = min_habitants
-
-RETURN any, carrer, num_habitants
-ORDER BY any ASC;
-
+ORDER BY any, num_habitants
+WITH any, COLLECT({carrer: carrer, num_habitants: num_habitants}) AS carrers_per_any
+RETURN any, carrers_per_any[0].carrer AS carrer_amb_menys_habitants, carrers_per_any[0].num_habitants AS num_habitants
+ORDER BY any;
