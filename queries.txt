@@ -47,3 +47,14 @@ RETURN p.name as nom_cap,
     numero_fills as num_fills
 ORDER BY num_fills DESC
 LIMIT 20
+
+// E 
+
+MATCH (h:House {municipality: 'SFLL'})<-[:LIVES_IN]-(i:Individual)
+WITH h.year_padron AS any, h.street AS carrer, COUNT(i) AS num_habitants
+WITH any, carrer, num_habitants, min(num_habitants) OVER (PARTITION BY any) AS min_habitants
+WHERE num_habitants = min_habitants
+
+RETURN any, carrer, num_habitants
+ORDER BY any ASC;
+
