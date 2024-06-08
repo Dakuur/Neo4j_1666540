@@ -1,0 +1,78 @@
+1 - Mostra, en forma de taula, les 10 components connexes més grans (ids i mida).
+
+CALL gds.wcc.stream({
+  nodeProjection: ['Individual', 'House'],
+  relationshipProjection: {
+    LIVES_IN: {
+      type: 'LIVES_IN',
+      orientation: 'UNDIRECTED'
+    }
+  }
+})
+YIELD nodeId, componentId
+WITH componentId, COUNT(nodeId) AS size
+RETURN componentId, size
+ORDER BY size DESC
+LIMIT 10;
+
+
+2 - Per cada municipi i any el nombre de parelles del tipus: (Individu)—
+(Habitatge).
+
+MATCH (i:Individual)-[:LIVES_IN]->(h:House) RETURN h.municipality AS municipi, h.year_padron AS any, COUNT(*) AS num_parelles ORDER BY municipi, any;
+
+
+
+SEMBLANÇA ENTRE NODES
+
+1 -  Determinar els habitatges que són els mateixos al llarg dels anys i afegir una aresta "MATEIX_HAB"
+
+MATCH (h1:House), (h2:House)
+WHERE h1.house_id = h2.house_id AND h1.year_padron < h2.year_padron
+MERGE (h1)-[:MATEIX_HAB]->(h2);
+
+
+2 - Crear un graf en memòria amb els nodes Individu i Habitatge i les relacions VIU, FAMILIA, MATEIX_HAB
+
+CALL gds.graph.project(
+  'graf_individu_habitatge',
+  ['Individual', 'House'],
+  {
+    LIVES_IN: {
+      type: 'LIVES_IN',
+      orientation: 'UNDIRECTED'
+    },
+    IS_FAMILY: {
+      type: 'IS_FAMILY',
+      orientation: 'UNDIRECTED'
+    },
+    MATEIX_HAB: {
+      type: 'MATEIX_HAB',
+      orientation: 'UNDIRECTED'
+    }
+  }
+);
+
+
+3 -  Calcular la similaritat entre els nodes del graf creat
+
+CALL gds.nodeSimilarity.write({
+  nodeProjection: ['Individual', 'House'],
+  relationshipProjection: {
+    LIVES_IN: {
+      type: 'LIVES_IN',
+      orientation: 'UNDIRECTED'
+    },
+    IS_FAMILY: {
+      type: 'IS_FAMILY',
+      orientation: 'UNDIRECTED'
+    },
+    MATEIX_HAB: {
+      type: 'MATEIX_HAB',
+      orientation: 'UNDIRECTED'
+    }
+  },
+  writeRelationshipType: 'SIMILAR_TO',
+  writeProperty: 'similarityScore'
+});
+
