@@ -1,4 +1,4 @@
-1 - Mostra, en forma de taula, les 10 components connexes més grans (ids i mida).
+*1 - Mostra, en forma de taula, les 10 components connexes més grans (ids i mida).
 
 CALL gds.wcc.stream({
   nodeProjection: ['Individual', 'House'],
@@ -54,7 +54,7 @@ CALL gds.graph.project(
 );
 
 
-3 -  Calcular la similaritat entre els nodes del graf creat
+*3 -  Calcular la similaritat entre els nodes del graf creat
 
 CALL gds.nodeSimilarity.write({
   nodeProjection: ['Individual', 'House'],
