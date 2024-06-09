@@ -48,6 +48,7 @@ RETURN p.name as nom_cap,
 ORDER BY num_fills DESC
 LIMIT 20
 
+
 // E 
 
 MATCH (h:House {municipality: 'SFLL'})<-[:LIVES_IN]-(i:Individual)
