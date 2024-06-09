@@ -1,9 +1,3 @@
-// Delete all
-
-match (a) -[r] -> () delete a, r;
-match (a) delete a;
-
-
 // Create Indexes
 
 CREATE INDEX house_id_index IF NOT EXISTS FOR (n:House) ON (n.id);
